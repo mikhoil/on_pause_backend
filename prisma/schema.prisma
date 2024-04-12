@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int            @id @default(autoincrement())
+  email           String         @unique
+  username        String
+  hashed_password String
+  daily_strick    Int            @default(0)
+  total_time      Decimal        @default(0)
+  total_sessions  Int            @default(0)
+  fouling         Int            @default(100)
+  subscriber      Boolean        @default(true)
+  roles           Role[]
+  favorites       Meditation[]
+  history         HistoryItem[]
+}
+
+model Role {
+  id          Int            @id @default(autoincrement())
+  value       String         @unique
+  description String
+  users       User[]
+}
+
+// model UsersOnRoles {
+//   user   User @relation(fields: [userId], references: [id])
+//   userId Int
+//   role   Role @relation(fields: [roleId], references: [id])
+//   roleId Int
+
+//   @@id([roleId, userId])
+// }
+
+model Practice {
+  id          Int          @id @default(autoincrement())
+  title       String
+  forSubs     Boolean      @default(true)
+  meditations Meditation[]
+}
+
+model Meditation {
+  id         Int          @id @default(autoincrement())
+  title      String
+  duration   Decimal
+  url        String
+  forSubs    Boolean      @default(true)
+  practice   Practice     @relation(fields: [practiceId], references: [id])
+  practiceId Int
+  user       User?        @relation(fields: [userId], references: [id])
+  userId     Int?
+  history    HistoryItem? @relation(fields: [historyId], references: [id])
+  historyId  Int?
+}
+
+model BgSound {
+  id  Int    @id @default(autoincrement())
+  url String
+}
+
+model Affirmation {
+  id   Int    @id @default(autoincrement())
+  text String @unique
+}
+
+model HistoryItem {
+  id          Int          @id @default(autoincrement())
+  date        DateTime
+  meditations Meditation[]
+  userId      Int
+  user        User         @relation(fields: [userId], references: [id])
+}

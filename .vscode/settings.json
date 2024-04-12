@@ -1,0 +1,7 @@
+{
+  "prettier.configPath": ".prettierrc",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.prettierPath": "./node_modules/prettier",
+  "CodeGPT.apiKey": "Cohere",
+  "CodeGPT.Autocomplete.provider": "CodeGPT Plus - Plus"
+}
