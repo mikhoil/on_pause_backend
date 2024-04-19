@@ -42,6 +42,11 @@ export class UsersController {
     return this.userService.deleteUserById(id);
   }
 
+  @Patch('subscription/add/:email')
+  addSubscription(@Param('email') email: string) {
+    return this.userService.addSubscription(email);
+  }
+
   @Patch('subscription/cancel/:email')
   cancelSubscription(@Param('email') email: string) {
     return this.userService.cancelSubscription(email);

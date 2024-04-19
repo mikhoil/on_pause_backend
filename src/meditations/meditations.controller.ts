@@ -20,6 +20,11 @@ export class MeditationsController {
     return this.meditationsService.create(dto);
   }
 
+  @Get()
+  getAll() {
+    return this.meditationsService.getAll();
+  }
+
   // @UseInterceptors(CheckSubscriptionInterceptor)
 
   @Get()

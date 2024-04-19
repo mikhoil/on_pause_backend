@@ -17,14 +17,15 @@ export class CheckSubscriptionInterceptor implements NestInterceptor {
         data.map(({ id, title, forSubs, meditations }) =>
           !user.subscriber && forSubs
             ? {
-                id: id,
-                title: title,
-                forSubs: forSubs,
+                id,
+                title,
+                forSubs,
                 meditations: meditations?.map(({ url, ...other }) => other),
               }
-            : data,
+            : { id, title, forSubs, meditations },
         ),
       ),
     );
   }
 }
+

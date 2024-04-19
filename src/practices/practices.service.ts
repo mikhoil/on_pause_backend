@@ -17,6 +17,14 @@ export class PracticesService {
   }
 
   async delete(id: string) {
+    const practice = await this.prisma.practice.findUnique({
+      where: { id: +id },
+      include: { meditations: true },
+    });
+    if (practice.meditations)
+      await this.prisma.meditation.deleteMany({
+        where: { practiceId: practice.id },
+      });
     return await this.prisma.practice.delete({ where: { id: +id } });
   }
 }

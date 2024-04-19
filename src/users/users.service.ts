@@ -34,6 +34,13 @@ export class UsersService {
     });
   }
 
+  async addSubscription(email: string) {
+    return await this.prisma.user.update({
+      where: { email },
+      data: { subscriber: true },
+    });
+  }
+
   async cancelSubscription(email: string) {
     return await this.prisma.user.update({
       where: { email },
