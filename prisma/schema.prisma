@@ -14,23 +14,24 @@ datasource db {
 }
 
 model User {
-  id              Int            @id @default(autoincrement())
-  email           String         @unique
-  username        String
-  hashed_password String
-  daily_strick    Int            @default(0)
-  total_time      Decimal        @default(0)
-  total_sessions  Int            @default(0)
-  fouling         Int            @default(100)
-  subscriber      Boolean        @default(true)
-  roles           Role[]
-  favorites       Meditation[]
-  history         HistoryItem[]
+  id                   Int           @id @default(autoincrement())
+  email                String        @unique
+  username             String
+  hashed_password      String
+  daily_strick         Int           @default(0)
+  total_time           Decimal       @default(0)
+  total_sessions       Int           @default(0)
+  fouling              Int           @default(100)
+  subscriber           Boolean       @default(true)
+  roles                Role[]
+  hashed_refresh_token String?
+  favorites            Meditation[]
+  history              HistoryItem[]
 }
 
 model Role {
-  id          Int            @id @default(autoincrement())
-  value       String         @unique
+  id          Int    @id @default(autoincrement())
+  value       String @unique
   description String
   users       User[]
 }
@@ -46,7 +47,7 @@ model Meditation {
   id         Int          @id @default(autoincrement())
   title      String
   duration   Int
-  url        String
+  key        String
   forSubs    Boolean      @default(true)
   practice   Practice     @relation(fields: [practiceId], references: [id])
   practiceId Int

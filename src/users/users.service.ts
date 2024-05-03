@@ -12,7 +12,10 @@ export class UsersService {
   ) {}
 
   async createUser(dto: CreateUserDto) {
-    return await this.prisma.user.create({ data: dto });
+    return await this.prisma.user.create({
+      data: dto,
+      include: { roles: true },
+    });
   }
 
   async deleteUserById(userId: number) {
@@ -24,7 +27,7 @@ export class UsersService {
   }
 
   async getUserById(userId: number) {
-    return await this.prisma.user.findUnique({ where: { id: userId } });
+    return await this.prisma.user.findUnique({ where: { id: userId }, include: {roles: true} });
   }
 
   async getUserByEmail(email: string) {
@@ -53,6 +56,14 @@ export class UsersService {
     return await this.prisma.user.update({
       where: { id: dto.userId },
       data: { roles: { connect: { id: role.id } } },
+      include: { roles: true },
+    });
+  }
+
+  async updateRefreshToken(hashedRefreshToken: string | null, userId: number) {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: { hashed_refresh_token: hashedRefreshToken },
     });
   }
 }

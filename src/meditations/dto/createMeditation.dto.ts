@@ -1,7 +1,6 @@
 export class CreateMeditationDto {
   readonly title: string;
-  readonly duration: number;
-  readonly practiceId: number;
+  readonly duration: string;
+  readonly practiceId: string;
   readonly forSubs?: boolean = true;
-  readonly url: string;
 }

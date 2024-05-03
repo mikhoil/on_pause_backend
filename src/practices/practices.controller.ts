@@ -5,12 +5,12 @@ import {
   Get,
   Param,
   Post,
+  Req,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { Roles } from 'src/auth/roles.decorator';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { CheckSubscriptionInterceptor } from 'src/meditations/interseptors/checkSubscriptionInterseptor';
+import { Request } from 'express';
+import { Roles } from 'src/roles/decorators/roles.decorator';
+import { RolesGuard } from 'src/roles/guards/roles.guard';
 import { CreatePracticeDto } from './dto/createPractice.dto';
 import { PracticesService } from './practices.service';
 
@@ -18,17 +18,17 @@ import { PracticesService } from './practices.service';
 export class PracticesController {
   constructor(private practicesService: PracticesService) {}
 
-  @Roles('ADMIN')
   @UseGuards(RolesGuard)
+  @Roles('ADMIN')
   @Post('/create')
   create(@Body() dto: CreatePracticeDto) {
     return this.practicesService.create(dto);
   }
 
-  @UseInterceptors(CheckSubscriptionInterceptor)
   @Get()
-  getAll() {
-    return this.practicesService.getAll();
+  getAll(@Req() req: Request) {
+    const userId = req.user['userId'];
+    return this.practicesService.getAll(userId);
   }
 
   @UseGuards(RolesGuard)
@@ -36,5 +36,12 @@ export class PracticesController {
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.practicesService.delete(id);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
+  @Delete()
+  deleteAll() {
+    return this.practicesService.deleteAll();
   }
 }
