@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { MeditationsService } from 'src/meditations/meditations.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersService } from 'src/users/users.service';
 import { CreatePracticeDto } from './dto/createPractice.dto';
@@ -8,6 +9,7 @@ export class PracticesService {
   constructor(
     private prisma: PrismaService,
     private usersService: UsersService,
+    private meditationsService: MeditationsService,
   ) {}
 
   async create(dto: CreatePracticeDto) {
@@ -23,16 +25,15 @@ export class PracticesService {
     });
   }
 
-  async delete(id: string) {
+  async delete(id: number) {
     const practice = await this.prisma.practice.findUnique({
-      where: { id: +id },
+      where: { id },
       include: { meditations: true },
     });
-    if (practice.meditations)
-      await this.prisma.meditation.deleteMany({
-        where: { practiceId: practice.id },
-      });
-    return await this.prisma.practice.delete({ where: { id: +id } });
+    practice.meditations.forEach(meditation =>
+      this.meditationsService.delete(meditation.id),
+    );
+    return await this.prisma.practice.delete({ where: { id } });
   }
 
   async deleteAll() {

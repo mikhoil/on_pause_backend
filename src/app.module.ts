@@ -7,6 +7,7 @@ import { MeditationsModule } from './meditations/meditations.module';
 import { PracticesModule } from './practices/practices.module';
 import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
+import { S3clientModule } from './s3client/s3client.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UsersModule } from './users/users.module';
     MeditationsModule,
     PracticesModule,
     RolesModule,
+    S3clientModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: AccessTokenGuard }],
 })

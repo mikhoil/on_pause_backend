@@ -8,7 +8,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { log } from 'console';
 import { Observable } from 'rxjs';
 import { UsersService } from 'src/users/users.service';
 import { ROLES_KEY } from '../decorators/roles.decorator';
@@ -30,7 +29,6 @@ export class RolesGuard implements CanActivate {
         ROLES_KEY,
         context.getHandler(),
       );
-      log(requiredRoles);
       if (!requiredRoles) return true;
       const req = context.switchToHttp().getRequest();
       const authHeader = req.headers.authorization;

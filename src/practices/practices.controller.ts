@@ -35,7 +35,7 @@ export class PracticesController {
   @Roles('ADMIN')
   @Delete(':id')
   delete(@Param('id') id: string) {
-    return this.practicesService.delete(id);
+    return this.practicesService.delete(+id);
   }
 
   @UseGuards(RolesGuard)
