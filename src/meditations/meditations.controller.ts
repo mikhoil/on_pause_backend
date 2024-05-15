@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -51,5 +52,15 @@ export class MeditationsController {
   @Delete(':id')
   delete(@Param('id') id: string) {
     return this.meditationsService.delete(+id);
+  }
+
+  @Patch('history/:id')
+  listened(@Param('id') id: string, @Req() req: Request) {
+    return this.meditationsService.addToUserHistory(+id, req.user['userId']);
+  }
+
+  @Delete('history/clear')
+  clearHistory(@Req() req: Request) {
+    return this.meditationsService.clearHistory(req.user['userId']);
   }
 }

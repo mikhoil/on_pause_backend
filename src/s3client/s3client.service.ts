@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class S3clientService extends S3Client {
-  constructor(private configService: ConfigService) {
+  constructor(configService: ConfigService) {
     super({
       endpoint: configService.get<string>('AWS_ENDPOINT'),
       region: configService.get<string>('AWS_REGION'),

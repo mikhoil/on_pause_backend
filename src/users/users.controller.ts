@@ -8,8 +8,9 @@ import {
   Patch,
   Post,
   Query,
+  Req,
 } from '@nestjs/common';
-import { AddRoleDto } from './dto/addRole.dto';
+import { Request } from 'express';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UsersService } from './users.service';
 
@@ -42,18 +43,43 @@ export class UsersController {
     return this.userService.deleteUserById(id);
   }
 
-  @Patch('subscription/add/:email')
-  addSubscription(@Param('email') email: string) {
-    return this.userService.addSubscription(email);
+  @Patch('subscription/add')
+  addSubscription(@Req() req: Request) {
+    const userId = req.user['userId'];
+    return this.userService.addSubscription(userId);
   }
 
-  @Patch('subscription/cancel/:email')
-  cancelSubscription(@Param('email') email: string) {
-    return this.userService.cancelSubscription(email);
+  @Patch('subscription/cancel')
+  cancelSubscription(@Req() req: Request) {
+    const userId = req.user['userId'];
+    return this.userService.cancelSubscription(userId);
   }
 
-  @Post('role')
-  addRole(@Body() dto: AddRoleDto) {
-    return this.userService.addRole(dto);
+  @Post('role/:id')
+  addRole(@Param('id') id: string, @Body('role') role: string) {
+    return this.userService.addRole(+id, role);
+  }
+
+  @Patch('role/:id')
+  removeRole(@Param('id') id: string, @Body('role') role: string) {
+    return this.userService.removeRole(+id, role);
+  }
+
+  @Patch('add-session')
+  addSession(@Req() req: Request) {
+    const userId = req.user['userId'];
+    return this.userService.addSession(userId);
+  }
+
+  @Patch('increase-total-time')
+  increaseTotalTime(@Req() req: Request, @Body('time') time: number) {
+    const userId = req.user['userId'];
+    return this.userService.increaseTotalTime(userId, time);
+  }
+
+  @Patch('update-strick')
+  updateStrick(@Req() req: Request) {
+    const userId = req.user['userId'];
+    return this.userService.updateStrick(userId);
   }
 }
