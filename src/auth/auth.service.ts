@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { UsersService } from './../users/users.service';
 import { AuthLoginDto } from './dto/authLogin.dto';
 import { AuthRegisterDto } from './dto/authRegister.dto';
@@ -68,7 +68,6 @@ export class AuthService {
         },
       ),
     ]);
-
     return {
       accessToken,
       refreshToken,
@@ -96,7 +95,7 @@ export class AuthService {
   }
 
   async logout(userId: number) {
-    return await this.userService.updateRefreshToken(null, userId);
+    await this.userService.updateRefreshToken(null, userId);
   }
 
   private async validateUser(userDto: AuthLoginDto) {

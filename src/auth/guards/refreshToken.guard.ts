@@ -1,23 +1,21 @@
 import {
+  CanActivate,
   ExecutionContext,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth.service';
 
 @Injectable()
-export class RefreshTokenGuard extends AuthGuard('jwt-refresh') {
+export class RefreshTokenGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
     private authService: AuthService,
-  ) {
-    super();
-  }
+  ) {}
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {

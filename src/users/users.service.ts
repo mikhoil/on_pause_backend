@@ -30,7 +30,10 @@ export class UsersService {
   async getUserById(id: number) {
     return await this.prisma.user.findUnique({
       where: { id },
-      include: { roles: true, history: true },
+      include: {
+        history: { include: { meditations: true }, orderBy: { date: 'desc' } },
+        roles: true,
+      },
     });
   }
 
@@ -42,16 +45,18 @@ export class UsersService {
   }
 
   async addSubscription(id: number) {
-    await this.prisma.user.update({
+    return await this.prisma.user.update({
       where: { id },
       data: { subscriber: true },
+      include: { history: true },
     });
   }
 
   async cancelSubscription(id: number) {
-    await this.prisma.user.update({
+    return await this.prisma.user.update({
       where: { id },
       data: { subscriber: false },
+      include: { history: true },
     });
   }
 
@@ -72,7 +77,7 @@ export class UsersService {
   }
 
   async updateRefreshToken(hashedRefreshToken: string | null, id: number) {
-    return await this.prisma.user.update({
+    await this.prisma.user.update({
       where: { id },
       data: { hashed_refresh_token: hashedRefreshToken },
     });
@@ -119,5 +124,17 @@ export class UsersService {
         },
       });
     }
+  }
+
+  async increaseProgress(userId: number) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        progress:
+          user.limit > 0 ? Math.min(user.progress + 10, 100) : user.progress,
+        limit: user.limit > 0 ? Math.max(user.limit - 10, 0) : user.limit,
+      },
+    });
   }
 }

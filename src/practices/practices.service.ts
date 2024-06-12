@@ -18,11 +18,33 @@ export class PracticesService {
 
   async getAll(userId: number) {
     const { subscriber } = await this.usersService.getUserById(userId);
-    return await this.prisma.practice.findMany({
-      include: {
-        meditations: subscriber ? true : { select: { key: false } },
-      },
-    });
+    return (
+      await this.prisma.practice.findMany({
+        include: {
+          meditations: true,
+        },
+        orderBy: { id: 'asc' },
+      })
+    ).map(({ meditations, ...other }) => ({
+      ...other,
+      meditations: meditations.map(meditation => {
+        const { forSubs, audio, ...other } = meditation;
+        return !forSubs || (forSubs && subscriber)
+          ? meditation
+          : { ...other, forSubs };
+      }),
+    }));
+  }    
+
+  async getById(id: number) {
+    return await this.prisma.practice.findUnique({ where: { id }, include:{meditations:true} });
+  }
+
+  async editColors(id: number, colors: string[]) {
+    await this.prisma.practice.update({
+      where: { id },
+      data: { colors },
+    })
   }
 
   async delete(id: number) {

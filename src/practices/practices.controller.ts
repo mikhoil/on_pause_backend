@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -29,6 +30,18 @@ export class PracticesController {
   getAll(@Req() req: Request) {
     const userId = req.user['userId'];
     return this.practicesService.getAll(userId);
+  }
+
+  @Get(':id')
+  getById(@Param('id') id: string) {
+    return this.practicesService.getById(+id);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
+  @Patch(':id')
+  editColors(@Param('id') id: string, @Body('colors') colors: string[]) {
+    return this.practicesService.editColors(+id, colors);
   }
 
   @UseGuards(RolesGuard)

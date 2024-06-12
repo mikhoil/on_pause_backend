@@ -12,7 +12,7 @@ export class AuthController {
 
   @Public()
   @Post('/login')
-  async login(@Body() userDto: AuthLoginDto) {
+  login(@Body() userDto: AuthLoginDto) {
     return this.authService.login(userDto);
   }
 
@@ -23,7 +23,7 @@ export class AuthController {
   }
 
   @Get('/me')
-  me(@Req() req) {
+  me(@Req() req: Request) {
     const userId = req.user['userId'];
     return this.authService.me(userId);
   }

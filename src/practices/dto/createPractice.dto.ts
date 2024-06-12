@@ -1,4 +1,4 @@
 export class CreatePracticeDto {
   readonly title: string;
-  readonly forSubs?: boolean = true;
+  readonly colors: string[];
 }

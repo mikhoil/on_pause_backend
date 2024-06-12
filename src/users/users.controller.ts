@@ -43,13 +43,13 @@ export class UsersController {
     return this.userService.deleteUserById(id);
   }
 
-  @Patch('subscription/add')
+  @Patch('subscription/on')
   addSubscription(@Req() req: Request) {
     const userId = req.user['userId'];
     return this.userService.addSubscription(userId);
   }
 
-  @Patch('subscription/cancel')
+  @Patch('subscription/off')
   cancelSubscription(@Req() req: Request) {
     const userId = req.user['userId'];
     return this.userService.cancelSubscription(userId);

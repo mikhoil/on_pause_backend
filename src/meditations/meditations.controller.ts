@@ -26,9 +26,14 @@ export class MeditationsController {
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
   @Post('/create')
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'meditation', maxCount: 1 }]))
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'audio', maxCount: 1 },
+      { name: 'image', maxCount: 1 },
+    ]),
+  )
   create(@UploadedFiles() files, @Body() dto: CreateMeditationDto) {
-    return this.meditationsService.create(dto, files.meditation[0]);
+    return this.meditationsService.create(dto, files.audio[0], files.image[0]);
   }
 
   @Get()
@@ -55,12 +60,22 @@ export class MeditationsController {
   }
 
   @Patch('history/:id')
-  listened(@Param('id') id: string, @Req() req: Request) {
-    return this.meditationsService.addToUserHistory(+id, req.user['userId']);
+  addToUserHistory(@Param('id') id: string, @Req() req: Request) {
+    const userId = req.user['userId'];
+    return this.meditationsService.addToUserHistory(+id, userId);
   }
 
   @Delete('history/clear')
   clearHistory(@Req() req: Request) {
     return this.meditationsService.clearHistory(req.user['userId']);
+  }
+
+  @Patch('update')
+  updateHistoryAndStats(
+    @Req() req: Request,
+    @Body() { id, time }: { id: number; time: number },
+  ) {
+    const userId = req.user['userId'];
+    return this.meditationsService.updateHistoryAndStats(id, time, userId);
   }
 }

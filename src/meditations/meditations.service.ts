@@ -14,17 +14,35 @@ export class MeditationsService {
     private s3Client: S3clientService,
   ) {}
 
-  async create({ duration, practiceId, ...dto }: CreateMeditationDto, file) {
-    const key = v4();
+  async create(
+    { duration, practiceId, ...dto }: CreateMeditationDto,
+    audioFile,
+    imageFile,
+  ) {
+    const audio = v4() + '.' + audioFile.originalname.split('.')[1];
     await this.s3Client.send(
       new PutObjectCommand({
         Bucket: 'on-pause-meditations',
-        Key: key + '.mp3',
-        Body: file.buffer,
+        Key: audio,
+        Body: audioFile.buffer,
+      }),
+    );
+    const image = v4() + '.' + imageFile.originalname.split('.')[1];
+    await this.s3Client.send(
+      new PutObjectCommand({
+        Bucket: 'on-pause-meditations',
+        Key: image,
+        Body: imageFile.buffer,
       }),
     );
     return await this.prisma.meditation.create({
-      data: { key, duration: +duration, practiceId: +practiceId, ...dto },
+      data: {
+        audio,
+        image,
+        duration: +duration,
+        practiceId: +practiceId,
+        ...dto,
+      },
     });
   }
 
@@ -32,7 +50,7 @@ export class MeditationsService {
     const { subscriber } = await this.usersService.getUserById(userId);
     return await this.prisma.meditation.findMany({
       select: {
-        key: subscriber,
+        audio: subscriber,
         duration: true,
         practiceId: true,
         forSubs: true,
@@ -59,7 +77,13 @@ export class MeditationsService {
     await this.s3Client.send(
       new DeleteObjectCommand({
         Bucket: 'on-pause-meditations',
-        Key: meditation.key + '.mp3',
+        Key: meditation.audio,
+      }),
+    );
+    await this.s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: 'on-pause-meditations',
+        Key: meditation.image,
       }),
     );
     return meditation;
@@ -70,23 +94,33 @@ export class MeditationsService {
     const userHistory = await this.prisma.historyItem.findMany({
       where: { userId },
     });
-    if (!userHistory.some(historyItem => historyItem.date === date))
-      return await this.prisma.historyItem.create({
+    if (!userHistory.some(historyItem => historyItem.date === date)) {
+      const meditation = await this.getById(id);
+      console.log(meditation);
+      await this.prisma.historyItem.create({
         data: {
           date,
           userId,
           meditations: { connect: { id } },
         },
-        include: { meditations: true },
       });
-    return await this.prisma.historyItem.update({
-      where: { date_userId: { date, userId } },
-      data: { meditations: { connect: { id } } },
-      include: { meditations: true },
-    });
+    } else
+      await this.prisma.historyItem.update({
+        where: { date_userId: { date, userId } },
+        data: { meditations: { connect: { id } } },
+      });
   }
 
   async clearHistory(userId: number) {
     return await this.prisma.historyItem.deleteMany({ where: { userId } });
+  }
+
+  async updateHistoryAndStats(id: number, time: number, userId: number) {
+    await this.addToUserHistory(id, userId);
+    await this.usersService.addSession(userId);
+    await this.usersService.increaseTotalTime(userId, time);
+    await this.usersService.updateStrick(userId);
+    await this.usersService.increaseProgress(userId);
+    return await this.usersService.getUserById(userId);
   }
 }
